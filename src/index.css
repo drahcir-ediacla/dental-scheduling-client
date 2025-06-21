@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+/* Minimal global styles to support Tailwind layout without conflicts */
+
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: #f0f4f8; /* Light neutral background to match Tailwind theme */
+  color: #1f2937; /* Tailwind gray-800 for base text */
+}
+
+a {
+  text-decoration: none;
+  color: inherit; /* Let Tailwind control link color */
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
