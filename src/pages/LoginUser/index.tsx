@@ -48,7 +48,7 @@ const LoginUser: React.FC = () => {
 
         {serverError && <p className="text-red-600 text-sm mb-4 text-center">{serverError}</p>}
 
-        <label className="block mb-2 text-gray-700">Email</label>
+        <label className="block mb-2 text-gray-700 font-medium">Email</label>
         <input
           type="email"
           name="email"
@@ -60,7 +60,7 @@ const LoginUser: React.FC = () => {
         />
         {errors.email && <p className="text-red-500 text-sm mb-3">{errors.email}</p>}
 
-        <label className="block mt-4 mb-2 text-gray-700">Password</label>
+        <label className="block mt-4 mb-2 text-gray-700 font-medium">Password</label>
         <input
           type="password"
           name="password"

@@ -54,7 +54,7 @@ const CreateAccount = () => {
 
         {serverError && <p className="text-red-600 text-sm mb-4 text-center">{serverError}</p>}
 
-        <label className="block mb-2 text-gray-700">First Name</label>
+        <label className="block mb-2 text-gray-700 font-medium">First Name</label>
         <input
           type="text"
           name="firstName"
@@ -66,7 +66,7 @@ const CreateAccount = () => {
         />
         {errors.firstName && <p className="text-red-500 text-sm mb-3">{errors.firstName}</p>}
 
-        <label className="block mb-2 text-gray-700">Last Name</label>
+        <label className="block mb-2 text-gray-700 font-medium">Last Name</label>
         <input
           type="text"
           name="lastName"
@@ -78,7 +78,7 @@ const CreateAccount = () => {
         />
         {errors.lastName && <p className="text-red-500 text-sm mb-3">{errors.lastName}</p>}
 
-        <label className="block mb-2 text-gray-700">Email</label>
+        <label className="block mb-2 text-gray-700 font-medium">Email</label>
         <input
           type="email"
           name="email"
@@ -90,7 +90,7 @@ const CreateAccount = () => {
         />
         {errors.email && <p className="text-red-500 text-sm mb-3">{errors.email}</p>}
 
-        <label className="block mb-2 text-gray-700">Password</label>
+        <label className="block mb-2 text-gray-700 font-medium">Password</label>
         <input
           type="password"
           name="password"
