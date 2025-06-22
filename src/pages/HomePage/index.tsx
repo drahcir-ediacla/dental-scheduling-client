@@ -5,6 +5,7 @@ import type { RootState } from '../../redux/store';
 import { FaSignInAlt, FaUserPlus, FaSmile, FaTooth, FaTeethOpen } from 'react-icons/fa';
 import { MdCleaningServices, MdOutlineMedicalServices } from 'react-icons/md';
 import { GiToothbrush } from 'react-icons/gi';
+import PrimaryButton from '../../components/PrimaryButton';
 
 const Home = () => {
   const user = useAppSelector((state: RootState) => state.auth.data);
@@ -91,12 +92,12 @@ const Home = () => {
 
       {/* Schedule Appointment */}
       <div className="text-center">
-        <button
+        <PrimaryButton
           onClick={() => navigate('/schedule')}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-2xl transition"
+          className="font-semibold transition"
         >
           Schedule an Appointment
-        </button>
+        </PrimaryButton>
       </div>
     </div>
   );

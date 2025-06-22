@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { loginSchema } from '../../schemas/loginSchema';
 import type { LoginSchemaType } from '../../schemas/loginSchema';
 import { axiosInstance } from '../../lib/axiosInstance';
+import PrimaryButton from '../../components/PrimaryButton';
 
 const LoginUser: React.FC = () => {
   const [form, setForm] = useState<LoginSchemaType>({ email: '', password: '' });
@@ -71,9 +72,7 @@ const LoginUser: React.FC = () => {
         />
         {errors.password && <p className="text-red-500 text-sm mb-4">{errors.password}</p>}
 
-        <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl mt-4 mb-4">
-          Login
-        </button>
+        <PrimaryButton type="submit" className="w-full mt-4 mb-4 rounded-xl">Login</PrimaryButton>
 
         <div className="flex flex-col items-center gap-2 text-blue-600">
           <button type="button" onClick={() => navigate('/')} className="hover:underline">
