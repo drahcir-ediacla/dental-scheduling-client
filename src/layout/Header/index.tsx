@@ -15,7 +15,13 @@ const Header = () => {
         <div className="absolute w-full top-6 right-0 flex gap-3 px-6">
 
             <div className='flex justify-between w-full'>
-                <button className="flex items-center text-2xl font-bold text-blue-900 border-0"><img src={Logo} alt='' className='w-[45px] h-[45px]' />Smile Bright</button>
+                <button
+                    className="flex items-center text-2xl font-bold text-blue-900 border-0"
+                    onClick={() => navigate('/')}
+                >
+                    <img src={Logo} alt='' className='w-[45px] h-[45px]' />
+                    Smile Bright
+                </button>
                 {user ? (
                     <LogoutButton>Logout</LogoutButton>
                 ) : (
