@@ -7,14 +7,15 @@ interface TimeSlot {
 interface Props {
     data: TimeSlot[];
     selectedSlot: string;
+    selectedDate: Date | null;
     clickSelectedSlot: (id: string) => void;
 }
 
 
-const AvailableSlots = ({data, clickSelectedSlot, selectedSlot}: Props) => {
-  return (
-    <>
-        {
+const AvailableSlots = ({ data, clickSelectedSlot, selectedSlot, selectedDate }: Props) => {
+    return (
+        <>
+            {
                 data.length > 0 && (
                     <>
                         <label className="block mb-2 text-gray-700 font-medium">Available Time Slots</label>
@@ -33,8 +34,12 @@ const AvailableSlots = ({data, clickSelectedSlot, selectedSlot}: Props) => {
                     </>
                 )
             }
-    </>
-  )
+            {selectedDate && data.length === 0 && (
+                <div className="text-red-500 text-center m-6"><h3>No Time Slots Available!</h3></div>
+            )}
+
+        </>
+    )
 }
 
 export default AvailableSlots

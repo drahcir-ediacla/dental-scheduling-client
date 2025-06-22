@@ -1,8 +1,11 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useAppSelector, } from '../../../redux/store';
+import type { RootState } from '../../../redux/store';
 import axios from 'axios';
 import SelectDentist from './SelectDentist';
 import CustomDatePicker from './CustomDatePicker';
 import AvailableSlots from './AvailableSlots';
+import { axiosInstance } from '../../../lib/axiosInstance';
 
 interface Dentist {
     id: string;
@@ -11,63 +14,112 @@ interface Dentist {
 
 interface TimeSlot {
     id: string;
+    dentistId: string;
+    date: string;
     time: string;
+    isBooked: boolean;
 }
 
 const BookingForm = () => {
-    const [dentists, setDentists] = useState<Dentist[]>([{ id: 'id2', name: 'Dr. Kwak Kwak' }, { id: 'id2', name: 'Dr. Strange' }]);
+    const user = useAppSelector((state: RootState) => state.auth.data);
+    console.log('User ID:', user?.id)
+    const [dentists, setDentists] = useState<Dentist[]>([]);
     const [selectedDentist, setSelectedDentist] = useState<string>('');
+    console.log('selectedDentist:', selectedDentist)
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
     console.log('Selected Date:', selectedDate)
-    const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([{ id: 'id1', time: '1:00' }, { id: 'id2', time: '1:00' }, { id: 'id3', time: '1:00' }, { id: 'id4', time: '1:00' }]);
+    const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
     const [selectedSlot, setSelectedSlot] = useState<string>('');
+    console.log('selectedSlot:', selectedSlot)
 
-
-    // Fetch dentists on page load
     useEffect(() => {
-        axios.get('http://localhost:5000/api/dentists')
-            .then(response => setDentists(response.data))
-            .catch(error => console.error('Error fetching dentists:', error));
+        const controller = new AbortController();
+
+        const fetchDentists = async () => {
+            try {
+                const response = await axiosInstance.get('/api/dentists');
+                setDentists(response.data);
+            } catch (error: unknown) {
+                if (axios.isAxiosError(error)) {
+                    console.error('Axios error:', error.response?.data || error.message);
+                } else {
+                    console.error('Unexpected error:', error);
+                }
+            }
+        };
+        fetchDentists();
+        return () => {
+            controller.abort(); // cleanup
+        };
     }, []);
 
-    // Fetch available slots when dentist and date are selected
+
     useEffect(() => {
-        if (selectedDentist && selectedDate) {
-            const formattedDate = selectedDate.toISOString().split('T')[0]; // yyyy-mm-dd
-            axios.get(`http://localhost:5000/api/dentists/${selectedDentist}/slots?date=${formattedDate}`)
-                .then(response => setTimeSlots(response.data))
-                .catch(error => console.error('Error fetching slots:', error));
+        const fetchTimeSlots = async () => {
+            if (selectedDentist && selectedDate) {
+                const formattedDate = selectedDate.toLocaleDateString('en-CA'); // yyyy-mm-dd
+                console.log('Formatted Date:', formattedDate)
+                try {
+                    const response = await axiosInstance.get(`/api/dentists/${selectedDentist}/slots?date=${formattedDate}`)
+                    setTimeSlots(response.data)
+                } catch (error: unknown) {
+                    if (axios.isAxiosError(error)) {
+                        console.error('Axios error:', error.response?.data || error.message);
+                    } else {
+                        console.error('Unexpected error:', error);
+                    }
+                }
+            }
         }
-    }, [selectedDentist, selectedDate]);
+        fetchTimeSlots()
+    }, [selectedDentist, selectedDate])
 
-    const handleBooking = (e: React.FormEvent) => {
+    const handleBooking = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!selectedDentist || !selectedDate || !selectedSlot) return alert('Please complete all selections.');
 
-        axios.post('http://localhost:5000/api/bookings', {
-            dentistId: selectedDentist,
-            slotId: selectedSlot,
-            date: selectedDate.toISOString().split('T')[0] // Send date to backend
-        })
-            .then(() => alert('Appointment successfully booked!'))
-            .catch(error => console.error('Booking failed:', error));
+        if (!selectedDentist || !selectedDate || !selectedSlot) {
+            return alert('Please complete all selections.');
+        }
+
+        try {
+            await axiosInstance.post('/api/schedule-appointment', {
+                userId: user?.id,
+                dentistId: selectedDentist,
+                timeSlotId: selectedSlot,
+            });
+
+            alert('Appointment successfully booked!');
+            window.location.reload();
+        } catch (error) {
+            console.error('Booking failed:', error);
+            alert('Something went wrong while booking the appointment.');
+        }
     };
 
+    
 
     return (
         < form onSubmit={handleBooking} className="bg-white p-8 rounded-2xl shadow-md w-full max-w-5xl" >
             <h2 className="text-2xl font-bold text-blue-800 mb-6 text-center">Book an Appointment</h2>
-            <SelectDentist data={dentists} value={selectedDentist} onChange={(e) => setSelectedDentist(e.target.value)} />
+            <SelectDentist data={dentists} value={selectedDentist} onChange={(e) => {setSelectedDentist(e.target.value); setSelectedSlot('');}} />
             <CustomDatePicker
                 selected={selectedDate}
-                onChange={(date) => setSelectedDate(date)}
+                onChange={(date) => { setSelectedDate(date); setSelectedSlot(''); }}
             />
-            <AvailableSlots 
-            data={timeSlots}
-            selectedSlot={selectedSlot}
-            clickSelectedSlot={setSelectedSlot}
+            <AvailableSlots
+                data={timeSlots}
+                selectedSlot={selectedSlot}
+                selectedDate={selectedDate}
+                clickSelectedSlot={setSelectedSlot}
             />
-            <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl">
+            <button
+                type="submit"
+                className={`w-full py-3 rounded-xl text-white transition ${!selectedDentist || !selectedDate || !selectedSlot
+                    ? 'bg-gray-400 cursor-not-allowed'
+                    : 'bg-blue-600 hover:bg-blue-700'
+                    }`}
+                disabled={!selectedDentist || !selectedDate || !selectedSlot}
+            >
                 Book Appointment
             </button>
         </form >
