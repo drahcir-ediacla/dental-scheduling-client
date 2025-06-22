@@ -1,4 +1,3 @@
-import { axiosInstance } from '../../lib/axiosInstance';
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector, } from '../../redux/store';
 import type { RootState } from '../../redux/store';
@@ -7,6 +6,7 @@ import { MdCleaningServices, MdOutlineMedicalServices } from 'react-icons/md';
 import { GiToothbrush } from 'react-icons/gi';
 import PrimaryButton from '../../components/PrimaryButton';
 import LogoutButton from '../../components/LogoutButton';
+import Header from '../../layout/Header';
 
 const Home = () => {
   const user = useAppSelector((state: RootState) => state.auth.data);
@@ -16,8 +16,10 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-blue-50 flex flex-col items-center justify-center p-6 relative">
 
+      <Header />
+
       {/* Top-right auth buttons */}
-      <div className="absolute top-6 right-6 flex gap-3">
+      {/* <div className="absolute top-6 right-6 flex gap-3">
         {user ? (
           <LogoutButton>Logout</LogoutButton>
         ) : (
@@ -36,7 +38,7 @@ const Home = () => {
             </button>
           </>
         )}
-      </div>
+      </div> */}
 
       {/* Header */}
       <header className="text-center mb-6 mt-10">
@@ -77,7 +79,7 @@ const Home = () => {
       {/* Schedule Appointment */}
       <div className="text-center">
         <PrimaryButton
-          onClick={() => navigate('/schedule')}
+          onClick={() => navigate(!user ? '/login' : '/book-appointment')}
           className="font-semibold transition"
         >
           Schedule an Appointment

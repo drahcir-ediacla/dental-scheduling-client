@@ -9,7 +9,7 @@ import type { RootState } from './redux/store';
 const Home = lazy(() => import('./pages/HomePage'));
 const LoginUser = lazy(() => import('./pages/LoginUser'));
 const CreateAccount = lazy(() => import('./pages/CreateAccount'));
-const Booking = lazy(() => import('./pages/Booking'));
+const BookAppointment = lazy(() => import('./pages/BookAppointment'));
 
 function App() {
   const currentUser = useAppSelector((state: RootState) => state.auth.data);
@@ -27,7 +27,7 @@ function App() {
         <Suspense fallback='...Loading'>
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/booking" element={<Booking />} />
+            <Route path="/book-appointment" element={<BookAppointment />} />
             <Route path="/login" element={currentUser ? <Navigate to="/" />: <LoginUser />} />
             <Route path="/create-account" element={currentUser ? <Navigate to="/" /> : <CreateAccount />} />
           </Routes>
