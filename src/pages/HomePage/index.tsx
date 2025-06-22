@@ -6,22 +6,11 @@ import { FaSignInAlt, FaUserPlus, FaSmile, FaTooth, FaTeethOpen } from 'react-ic
 import { MdCleaningServices, MdOutlineMedicalServices } from 'react-icons/md';
 import { GiToothbrush } from 'react-icons/gi';
 import PrimaryButton from '../../components/PrimaryButton';
+import LogoutButton from '../../components/LogoutButton';
 
 const Home = () => {
   const user = useAppSelector((state: RootState) => state.auth.data);
   const navigate = useNavigate();
-
-  const logoutUser = async () => {
-    try {
-      await axiosInstance.get("/api/user/logout");
-
-      // Redirect after successful logout
-      window.location.href = '/';
-
-    } catch (error) {
-      console.error("Logout failed", error);
-    }
-  };
 
 
   return (
@@ -30,12 +19,7 @@ const Home = () => {
       {/* Top-right auth buttons */}
       <div className="absolute top-6 right-6 flex gap-3">
         {user ? (
-          <button
-            onClick={logoutUser}
-            className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-2xl transition"
-          >
-            Logout
-          </button>
+          <LogoutButton>Logout</LogoutButton>
         ) : (
           <>
             <button
