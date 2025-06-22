@@ -27,8 +27,8 @@ function App() {
         <Suspense fallback='...Loading'>
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/book-appointment" element={<BookAppointment />} />
-            <Route path="/login" element={currentUser ? <Navigate to="/" />: <LoginUser />} />
+            <Route path="/book-appointment" element={!currentUser ? <Navigate to="/" /> : <BookAppointment />} />
+            <Route path="/login" element={currentUser ? <Navigate to="/" /> : <LoginUser />} />
             <Route path="/create-account" element={currentUser ? <Navigate to="/" /> : <CreateAccount />} />
           </Routes>
         </Suspense>
