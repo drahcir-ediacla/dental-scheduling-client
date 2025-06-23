@@ -108,7 +108,7 @@ const BookingForm = () => {
 
 
     return (
-        < form onSubmit={handleBooking} className="bg-white p-8 rounded-2xl shadow-md w-full max-w-5xl" >
+        < form onSubmit={handleBooking} className="bg-white p-8 rounded-2xl shadow-md w-full max-w-3xl" >
             <h2 className="text-2xl font-bold text-blue-800 mb-6 text-center">Book an Appointment</h2>
             <SelectDentist data={dentists} value={selectedDentist} onChange={(e) => { setSelectedDentist(e.target.value); setSelectedSlot(''); }} />
             <CustomDatePicker

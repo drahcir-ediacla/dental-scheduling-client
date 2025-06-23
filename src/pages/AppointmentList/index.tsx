@@ -1,33 +1,46 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
 import { useAppSelector, type RootState } from '../../redux/store';
+import { axiosInstance } from '../../lib/axiosInstance';
 import Header from '../../layout/Header';
+import MyAppointments from './components/MyAppointments';
+
+
+interface TimeSlot {
+    id: string,
+    date: string,
+    time: string,
+}
 
 interface Appointment {
     id: string;
+    dentistId: string;
     dentist: { name: string };
-    timeSlot: { date: string; time: string };
+    timeSlot: TimeSlot;
 }
 
 const AppointmentList = () => {
     const userId = useAppSelector((state: RootState) => state.auth.data?.id);
     const [appointments, setAppointments] = useState<Appointment[]>([]);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [editingId, setEditingId] = useState<string | null>(null);
+    const [availableSlots, setAvailableSlots] = useState<TimeSlot[]>([]);
+    const [selectedTimeSlotId, setSelectedTimeSlotId] = useState<string>('');
+    console.log('selectedTimeSlotId:', selectedTimeSlotId)
 
     useEffect(() => {
-        axios.get(`http://localhost:5000/api/users/${userId}/appointments`)
+        axiosInstance.get(`/api/users/${userId}/appointments`)
             .then(response => {
                 setAppointments(response.data);
                 setLoading(false);
             })
             .catch(error => console.error('Error fetching appointments:', error));
-    }, [userId]);
+    }, [userId, appointments]);
 
     const cancelAppointment = async (id: string) => {
         if (!window.confirm('Are you sure you want to cancel this appointment?')) return;
 
         try {
-            await axios.delete(`http://localhost:5000/api/appointments/${id}`);
+            await axiosInstance.delete(`/api/users/appointments/${id}`);
             setAppointments(prev => prev.filter(a => a.id !== id));
             alert('Appointment cancelled successfully.');
         } catch (error) {
@@ -35,14 +48,33 @@ const AppointmentList = () => {
         }
     };
 
-    const updateAppointment = async (id: string) => {
-        const newTimeSlotId = prompt('Enter new Time Slot ID:');
-        if (!newTimeSlotId) return;
+    const fetchAvailableSlots = async (dentistId: string, date: string) => {
+        try {
+            const response = await axiosInstance.get(`/api/dentists/${dentistId}/slots?date=${date}`);
+            setAvailableSlots(response.data);
+        } catch (error) {
+            console.error('Error fetching available slots:', error);
+        }
+    };
+
+    const changeAppointment = (appointment: Appointment) => {
+        setEditingId(appointment.id);
+        setSelectedTimeSlotId('');
+        fetchAvailableSlots(appointment.dentistId, appointment.timeSlot.date);
+    };
+
+    const handleSubmitUpdate = async (appointmentId: string) => {
+        if (!selectedTimeSlotId) {
+            alert('Please select a new time slot.');
+            return;
+        }
 
         try {
-            await axios.put(`http://localhost:5000/api/appointments/${id}`, { newTimeSlotId });
+            await axiosInstance.put(`/api/users/appointments/${appointmentId}`, { newTimeSlotId: selectedTimeSlotId });
             alert('Appointment updated successfully.');
-            window.location.reload();
+            setSelectedTimeSlotId('');
+            setEditingId(null)
+            return;
         } catch (error) {
             console.error('Error updating appointment:', error);
         }
@@ -53,35 +85,17 @@ const AppointmentList = () => {
     return (
         <div className="min-h-screen p-6 bg-blue-50">
             <Header />
-            <h1 className="text-2xl font-bold text-blue-800 mb-6 text-center mt-20">My Appointments</h1>
-            {appointments.length === 0 ? (
-                <p className="text-center">You have no scheduled appointments.</p>
-            ) : (
-                <div className="space-y-4 max-w-3xl mx-auto">
-                    {appointments.map(appointment => (
-                        <div key={appointment.id} className="bg-white p-4 rounded-xl shadow flex justify-between items-center">
-                            <div>
-                                <p className="font-semibold">{appointment.dentist.name}</p>
-                                <p className="text-gray-500">{appointment.timeSlot.date} - {appointment.timeSlot.time}</p>
-                            </div>
-                            <div className="space-x-2">
-                                <button
-                                    onClick={() => updateAppointment(appointment.id)}
-                                    className="bg-yellow-500 text-white px-4 py-2 rounded-xl hover:bg-yellow-600"
-                                >
-                                    Update
-                                </button>
-                                <button
-                                    onClick={() => cancelAppointment(appointment.id)}
-                                    className="bg-red-500 text-white px-4 py-2 rounded-xl hover:bg-red-600"
-                                >
-                                    Cancel
-                                </button>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            )}
+            <MyAppointments 
+            data={appointments}
+            changeAppointment={changeAppointment}
+            cancelAppointment={cancelAppointment}
+            editingId={editingId}
+            selectedTimeSlotId={selectedTimeSlotId}
+            setSelectedTimeSlotId={(e) => setSelectedTimeSlotId(e.target.value)}
+            availableSlots={availableSlots}
+            handleSubmitUpdate={handleSubmitUpdate}
+            setEditingId={setEditingId}
+            />
         </div>
     );
 };
