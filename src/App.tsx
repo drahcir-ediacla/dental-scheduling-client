@@ -10,6 +10,7 @@ const Home = lazy(() => import('./pages/HomePage'));
 const LoginUser = lazy(() => import('./pages/LoginUser'));
 const CreateAccount = lazy(() => import('./pages/CreateAccount'));
 const BookAppointment = lazy(() => import('./pages/BookAppointment'));
+const AppointmentList = lazy(() => import('./pages/AppointmentList'));
 
 function App() {
   const currentUser = useAppSelector((state: RootState) => state.auth.data);
@@ -24,10 +25,11 @@ function App() {
   return (
     <>
       <Router>
-        <Suspense fallback='...Loading'>
+        <Suspense fallback={<div className="text-center mt-10">Loading...</div>}>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/book-appointment" element={!currentUser ? <Navigate to="/" /> : <BookAppointment />} />
+            <Route path="/appointment-list" element={!currentUser ? <Navigate to="/" /> : <AppointmentList />} />
             <Route path="/login" element={currentUser ? <Navigate to="/" /> : <LoginUser />} />
             <Route path="/create-account" element={currentUser ? <Navigate to="/" /> : <CreateAccount />} />
           </Routes>

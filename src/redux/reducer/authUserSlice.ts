@@ -24,7 +24,7 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    setAuthUser: (state, action: PayloadAction<UserData>) => {
+    setAuthUser: (state, action: PayloadAction<UserData | null>) => {
       if (JSON.stringify(state.data) !== JSON.stringify(action.payload)) {
         state.data = action.payload;
       }

@@ -6,6 +6,7 @@ import SelectDentist from './SelectDentist';
 import CustomDatePicker from './CustomDatePicker';
 import AvailableSlots from './AvailableSlots';
 import { axiosInstance } from '../../../lib/axiosInstance';
+import PrimaryButton from '../../../components/PrimaryButton';
 
 interface Dentist {
     id: string;
@@ -31,6 +32,7 @@ const BookingForm = () => {
     const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
     const [selectedSlot, setSelectedSlot] = useState<string>('');
     console.log('selectedSlot:', selectedSlot)
+    const [isLoading, setIsLoading] = useState(false)
 
     useEffect(() => {
         const controller = new AbortController();
@@ -74,34 +76,41 @@ const BookingForm = () => {
         fetchTimeSlots()
     }, [selectedDentist, selectedDate])
 
+
     const handleBooking = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (!selectedDentist || !selectedDate || !selectedSlot) {
             return alert('Please complete all selections.');
         }
-
+        setIsLoading(true)
         try {
             await axiosInstance.post('/api/schedule-appointment', {
                 userId: user?.id,
                 dentistId: selectedDentist,
                 timeSlotId: selectedSlot,
             });
-
+            setIsLoading(false)
             alert('Appointment successfully booked!');
-            window.location.reload();
+
+            setSelectedDentist('');
+            setSelectedDate(null);
+            setSelectedSlot('');
+            setTimeSlots([]);
+
         } catch (error) {
+            setIsLoading(false)
             console.error('Booking failed:', error);
             alert('Something went wrong while booking the appointment.');
         }
     };
 
-    
+
 
     return (
         < form onSubmit={handleBooking} className="bg-white p-8 rounded-2xl shadow-md w-full max-w-5xl" >
             <h2 className="text-2xl font-bold text-blue-800 mb-6 text-center">Book an Appointment</h2>
-            <SelectDentist data={dentists} value={selectedDentist} onChange={(e) => {setSelectedDentist(e.target.value); setSelectedSlot('');}} />
+            <SelectDentist data={dentists} value={selectedDentist} onChange={(e) => { setSelectedDentist(e.target.value); setSelectedSlot(''); }} />
             <CustomDatePicker
                 selected={selectedDate}
                 onChange={(date) => { setSelectedDate(date); setSelectedSlot(''); }}
@@ -112,16 +121,25 @@ const BookingForm = () => {
                 selectedDate={selectedDate}
                 clickSelectedSlot={setSelectedSlot}
             />
-            <button
+            <PrimaryButton
                 type="submit"
-                className={`w-full py-3 rounded-xl text-white transition ${!selectedDentist || !selectedDate || !selectedSlot
+                className={`flex justify-center w-full py-3 rounded-xl text-white transition ${!selectedDentist || !selectedDate || !selectedSlot
                     ? 'bg-gray-400 cursor-not-allowed'
                     : 'bg-blue-600 hover:bg-blue-700'
                     }`}
                 disabled={!selectedDentist || !selectedDate || !selectedSlot}
             >
-                Book Appointment
-            </button>
+                {isLoading ? (
+                    <>
+                        <svg className="mr-3 -ml-1 size-5 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        <span>Scheduling...</span>
+                    </>
+                ) : (
+                    <>
+                        Book Appointment
+                    </>
+                )}
+            </PrimaryButton>
         </form >
     )
 }

@@ -13,15 +13,16 @@ const CreateAccount = () => {
     password: '',
   });
 
+  const navigate = useNavigate();
   const [errors, setErrors] = useState<Partial<RegisterSchemaType>>({});
   const [serverError, setServerError] = useState('');
-  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
- const handleRegister = async (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setServerError('');
 
@@ -37,11 +38,14 @@ const CreateAccount = () => {
     }
 
     setErrors({});
+    setIsLoading(true)
     try {
       const response = await axiosInstance.post('/api/users/register', form);
       console.log('Registration successful:', response.data);
+      setIsLoading(false)
       navigate('/login');
     } catch (error: any) {
+      setIsLoading(false)
       console.error('Registration failed:', error);
       setServerError(error?.response?.data?.message || 'Registration failed. Please try again.');
     }
@@ -60,9 +64,8 @@ const CreateAccount = () => {
           name="firstName"
           value={form.firstName}
           onChange={handleChange}
-          className={`w-full p-3 mb-1 border rounded-xl focus:outline-none focus:ring-2 ${
-            errors.firstName ? 'border-red-500 ring-red-300' : 'focus:ring-blue-500'
-          }`}
+          className={`w-full p-3 mb-1 border rounded-xl focus:outline-none focus:ring-2 ${errors.firstName ? 'border-red-500 ring-red-300' : 'focus:ring-blue-500'
+            }`}
         />
         {errors.firstName && <p className="text-red-500 text-sm mb-3">{errors.firstName}</p>}
 
@@ -72,9 +75,8 @@ const CreateAccount = () => {
           name="lastName"
           value={form.lastName}
           onChange={handleChange}
-          className={`w-full p-3 mb-1 border rounded-xl focus:outline-none focus:ring-2 ${
-            errors.lastName ? 'border-red-500 ring-red-300' : 'focus:ring-blue-500'
-          }`}
+          className={`w-full p-3 mb-1 border rounded-xl focus:outline-none focus:ring-2 ${errors.lastName ? 'border-red-500 ring-red-300' : 'focus:ring-blue-500'
+            }`}
         />
         {errors.lastName && <p className="text-red-500 text-sm mb-3">{errors.lastName}</p>}
 
@@ -84,9 +86,8 @@ const CreateAccount = () => {
           name="email"
           value={form.email}
           onChange={handleChange}
-          className={`w-full p-3 mb-1 border rounded-xl focus:outline-none focus:ring-2 ${
-            errors.email ? 'border-red-500 ring-red-300' : 'focus:ring-blue-500'
-          }`}
+          className={`w-full p-3 mb-1 border rounded-xl focus:outline-none focus:ring-2 ${errors.email ? 'border-red-500 ring-red-300' : 'focus:ring-blue-500'
+            }`}
         />
         {errors.email && <p className="text-red-500 text-sm mb-3">{errors.email}</p>}
 
@@ -96,13 +97,23 @@ const CreateAccount = () => {
           name="password"
           value={form.password}
           onChange={handleChange}
-          className={`w-full p-3 mb-1 border rounded-xl focus:outline-none focus:ring-2 ${
-            errors.password ? 'border-red-500 ring-red-300' : 'focus:ring-blue-500'
-          }`}
+          className={`w-full p-3 mb-1 border rounded-xl focus:outline-none focus:ring-2 ${errors.password ? 'border-red-500 ring-red-300' : 'focus:ring-blue-500'
+            }`}
         />
         {errors.password && <p className="text-red-500 text-sm mb-4">{errors.password}</p>}
 
-        <PrimaryButton type="submit" className="w-full mt-4 mb-4 rounded-xl">Create Account</PrimaryButton>
+        <PrimaryButton type="submit" className="flex justify-center items-center w-full mt-4 mb-4 rounded-xl">
+          {isLoading ? (
+            <>
+              <svg className="mr-3 -ml-1 size-5 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+              <span>Processing...</span>
+            </>
+          ) : (
+            <>
+              Create Account
+            </>
+          )}
+        </PrimaryButton>
 
         <div className="flex flex-col items-center gap-2 text-blue-600">
           <button type="button" onClick={() => navigate('/')} className="hover:underline">
