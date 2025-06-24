@@ -25,7 +25,8 @@ const AppointmentList = () => {
     const [editingId, setEditingId] = useState<string | null>(null);
     const [availableSlots, setAvailableSlots] = useState<TimeSlot[]>([]);
     const [selectedTimeSlotId, setSelectedTimeSlotId] = useState<string>('');
-    console.log('selectedTimeSlotId:', selectedTimeSlotId)
+    const [isUpdating, setIsUpdating] = useState<string | null>(null);
+    const [isCancelling, setIsCancelling] = useState<string | null>(null);
 
     useEffect(() => {
         axiosInstance.get(`/api/users/${userId}/appointments`)
@@ -39,14 +40,21 @@ const AppointmentList = () => {
     const cancelAppointment = async (id: string) => {
         if (!window.confirm('Are you sure you want to cancel this appointment?')) return;
 
-        try {
-            await axiosInstance.delete(`/api/users/appointments/${id}`);
-            setAppointments(prev => prev.filter(a => a.id !== id));
-            alert('Appointment cancelled successfully.');
-        } catch (error) {
-            console.error('Error cancelling appointment:', error);
-        }
+        setIsCancelling(id); // start loading for this appointment
+
+        setTimeout(async () => {
+            try {
+                await axiosInstance.delete(`/api/users/appointments/${id}`);
+                setAppointments(prev => prev.filter(a => a.id !== id));
+                alert('Appointment cancelled successfully.');
+            } catch (error) {
+                console.error('Error cancelling appointment:', error);
+            } finally {
+                setIsCancelling(null); // stop loading
+            }
+        }, 5000);
     };
+
 
     const fetchAvailableSlots = async (dentistId: string, date: string) => {
         try {
@@ -69,32 +77,42 @@ const AppointmentList = () => {
             return;
         }
 
-        try {
-            await axiosInstance.put(`/api/users/appointments/${appointmentId}`, { newTimeSlotId: selectedTimeSlotId });
-            alert('Appointment updated successfully.');
-            setSelectedTimeSlotId('');
-            setEditingId(null)
-            return;
-        } catch (error) {
-            console.error('Error updating appointment:', error);
-        }
+        setIsUpdating(appointmentId);
+
+        setTimeout(async () => {
+            try {
+                await axiosInstance.put(`/api/users/appointments/${appointmentId}`, {
+                    newTimeSlotId: selectedTimeSlotId,
+                });
+                alert('Appointment updated successfully.');
+                setSelectedTimeSlotId('');
+                setEditingId(null);
+            } catch (error) {
+                console.error('Error updating appointment:', error);
+            } finally {
+                setIsUpdating(null);
+            }
+        }, 5000);
     };
+
 
     if (loading) return <div className="text-center mt-10">Loading...</div>;
 
     return (
         <div className="min-h-screen p-6 bg-blue-50">
             <Header />
-            <MyAppointments 
-            data={appointments}
-            changeAppointment={changeAppointment}
-            cancelAppointment={cancelAppointment}
-            editingId={editingId}
-            selectedTimeSlotId={selectedTimeSlotId}
-            setSelectedTimeSlotId={(e) => setSelectedTimeSlotId(e.target.value)}
-            availableSlots={availableSlots}
-            handleSubmitUpdate={handleSubmitUpdate}
-            setEditingId={setEditingId}
+            <MyAppointments
+                data={appointments}
+                changeAppointment={changeAppointment}
+                cancelAppointment={cancelAppointment}
+                editingId={editingId}
+                selectedTimeSlotId={selectedTimeSlotId}
+                setSelectedTimeSlotId={(e) => setSelectedTimeSlotId(e.target.value)}
+                availableSlots={availableSlots}
+                handleSubmitUpdate={handleSubmitUpdate}
+                setEditingId={setEditingId}
+                isCancelling={isCancelling}
+                isUpdating={isUpdating}
             />
         </div>
     );
