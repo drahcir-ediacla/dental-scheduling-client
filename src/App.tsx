@@ -22,6 +22,8 @@ function App() {
     dispatch(authUser());
   }, [dispatch]);
 
+  console.log("✅ VITE_BASE_URL:", import.meta.env.VITE_BASE_URL);
+
   return (
     <>
       <Router>

@@ -35,8 +35,6 @@ const BookingForm = () => {
     const [isLoading, setIsLoading] = useState(false)
 
     useEffect(() => {
-        const controller = new AbortController();
-
         const fetchDentists = async () => {
             try {
                 const response = await axiosInstance.get('/api/dentists');
@@ -50,9 +48,6 @@ const BookingForm = () => {
             }
         };
         fetchDentists();
-        return () => {
-            controller.abort(); // cleanup
-        };
     }, []);
 
 

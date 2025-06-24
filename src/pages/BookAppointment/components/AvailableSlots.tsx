@@ -35,7 +35,7 @@ const AvailableSlots = ({ data, clickSelectedSlot, selectedSlot, selectedDate }:
                 )
             }
             {selectedDate && data.length === 0 && (
-                <div className="text-red-500 text-center m-6"><h3>No Time Slots Available!</h3></div>
+                <div className="text-center m-6 text-lg">Sorry no slots available!</div>
             )}
 
         </>
