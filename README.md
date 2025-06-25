@@ -22,11 +22,13 @@ This is the **frontend** repository for the Dental Scheduling System, allowing p
 client/
 ├── public/
 ├── src/
+│   ├── assets/          # Static files like images, icons, fonts, etc.
 │   ├── components/      # Shared UI components
+│   ├── layout/          # Page header
+│   ├── lib/             # Utility services using Axios
 │   ├── pages/           # App pages (Home, Login, Booking, etc.)
-│   ├── routes/          # React Router configuration
-│   ├── services/        # API services using Axios
-│   ├── types/           # TypeScript types
+│   ├── redux/           # Redux store, slices, and state management logic
+│   ├── schemas/         # Zod-based form validation schemas
 │   └── App.tsx          # Root component
 ├── tailwind.config.ts
 ├── index.css
@@ -82,14 +84,18 @@ If needed, you can configure a proxy in `vite.config.ts`.
 
 The frontend communicates with these backend endpoints:
 
-* `POST /api/auth/login`
-* `POST /api/auth/register`
+* `POST /api/users/register`
+* `POST /api/users/login`
+* `GET /api/user/logout`
+* `GET /api/refresh`
+* `POST /api/schedule-appointment`
+* `GET /dentists/:dentistId/slots`
 * `GET /api/dentists`
-* `GET /api/dentists/:id/available-slots`
-* `POST /api/appointments`
-* `GET /api/users/:id/appointments`
-* `PUT /api/appointments/:id`
-* `DELETE /api/appointments/:id`
+* `GET /api/users/:userId/appointments`
+* `DELETE /api/users/appointments/:id`
+* `PUT /api/users/appointments/:id`
+* `GET /api/get/user/auth`
+* `GET /api/get/users`
 
 ---
 
