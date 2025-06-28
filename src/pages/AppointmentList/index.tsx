@@ -42,7 +42,6 @@ const AppointmentList = () => {
 
         setIsCancelling(id); // start loading for this appointment
 
-        setTimeout(async () => {
             try {
                 await axiosInstance.delete(`/api/users/appointments/${id}`);
                 setAppointments(prev => prev.filter(a => a.id !== id));
@@ -52,7 +51,6 @@ const AppointmentList = () => {
             } finally {
                 setIsCancelling(null); // stop loading
             }
-        }, 5000);
     };
 
 
@@ -79,7 +77,6 @@ const AppointmentList = () => {
 
         setIsUpdating(appointmentId);
 
-        setTimeout(async () => {
             try {
                 await axiosInstance.put(`/api/users/appointments/${appointmentId}`, {
                     newTimeSlotId: selectedTimeSlotId,
@@ -92,7 +89,6 @@ const AppointmentList = () => {
             } finally {
                 setIsUpdating(null);
             }
-        }, 5000);
     };
 
 
