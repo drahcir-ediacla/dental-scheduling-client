@@ -35,22 +35,22 @@ const AppointmentList = () => {
                 setLoading(false);
             })
             .catch(error => console.error('Error fetching appointments:', error));
-    }, [userId, appointments]);
+    }, [userId]);
 
     const cancelAppointment = async (id: string) => {
         if (!window.confirm('Are you sure you want to cancel this appointment?')) return;
 
         setIsCancelling(id); // start loading for this appointment
 
-            try {
-                await axiosInstance.delete(`/api/users/appointments/${id}`);
-                setAppointments(prev => prev.filter(a => a.id !== id));
-                alert('Appointment cancelled successfully.');
-            } catch (error) {
-                console.error('Error cancelling appointment:', error);
-            } finally {
-                setIsCancelling(null); // stop loading
-            }
+        try {
+            await axiosInstance.delete(`/api/users/appointments/${id}`);
+            setAppointments(prev => prev.filter(a => a.id !== id));
+            alert('Appointment cancelled successfully.');
+        } catch (error) {
+            console.error('Error cancelling appointment:', error);
+        } finally {
+            setIsCancelling(null); // stop loading
+        }
     };
 
 
@@ -77,18 +77,26 @@ const AppointmentList = () => {
 
         setIsUpdating(appointmentId);
 
-            try {
-                await axiosInstance.put(`/api/users/appointments/${appointmentId}`, {
-                    newTimeSlotId: selectedTimeSlotId,
-                });
-                alert('Appointment updated successfully.');
-                setSelectedTimeSlotId('');
-                setEditingId(null);
-            } catch (error) {
-                console.error('Error updating appointment:', error);
-            } finally {
-                setIsUpdating(null);
-            }
+        try {
+            await axiosInstance.put(`/api/users/appointments/${appointmentId}`, {
+                newTimeSlotId: selectedTimeSlotId,
+            });
+            alert('Appointment updated successfully.');
+            // update the local state
+            setAppointments(prev =>
+                prev.map(app =>
+                    app.id === appointmentId
+                        ? { ...app, timeSlot: availableSlots.find(slot => slot.id === selectedTimeSlotId)! }
+                        : app
+                )
+            );
+            setSelectedTimeSlotId('');
+            setEditingId(null);
+        } catch (error) {
+            console.error('Error updating appointment:', error);
+        } finally {
+            setIsUpdating(null);
+        }
     };
 
 
